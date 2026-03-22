@@ -1,0 +1,158 @@
+File Manifest for ICPSR 4283
+
+Clifford, Richard M., Donna Bryant, Margaret Burchinal, Oscar Barbarin,
+Diane Early, Carollee Howes, Robert Pianta, and Pam Winton. National Center
+for Early Development and Learning Multistate Study of Pre-Kindergarten,
+2001-2003. ICPSR04283-v4. Ann Arbor, MI: Inter-university Consortium for
+Political and Social Research [distributor], 2017-07-17.
+http://doi.org/10.3886/ICPSR04283.v4
+
+Details on the version history can be found below the file listings.
+
+
+Study-level Documentation
+
+    Filename                            Record  Record    Var.    Date        MD5
+                                        Length  Count     Count   Updated     Checksum
+
+    04283-descriptioncitation.pdf       -       -         -       2023-06-29  -
+
+    04283-related_literature.txt        -       -         -       daily       -
+
+    04283-manifest.txt                  -       -         -       daily       -
+
+    04283-Questionnaire.pdf             -       -         -       2009-06-08  eb0b662c4f49e7e420cab9f15a9888f1
+
+    04283-User_guide.pdf                -       -         -       2009-06-08  4e55f1c71026776af7c4a859bba57027
+
+
+DS0001 Main Child Level Public-Use Version
+
+    Filename                            Record  Record    Var.    Date        MD5
+                                        Length  Count     Count   Updated     Checksum
+
+    04283-0001-Codebook.pdf             -       -         -       2017-07-17  e446e37ce5abc44ec01f542b066ab23a
+
+    04283-0001-Data.dta                 -       1,015     1210    2017-07-17  5afff0d373ca21c03d2e534576977c37
+
+    04283-0001-Data.rda                 -       1,015     1210    2017-07-17  e1dd29c3fe46e0ac1ebb90f51ef041d3
+
+    04283-0001-Data.sav                 -       1,015     1210    2017-07-17  6ba04b78048fd4e3dad108d7588b8239
+
+    04283-0001-Data.stc                 -       1,015     1210    2017-07-17  3272bf3f760839de334b4cc81d664dff
+
+    04283-0001-Data.tsv                 -       1,015     1210    2017-07-17  899727a121c07cd401b73a75d51c64e6
+
+    04283-0001-Data.txt                 5695    1,015     1210    2017-07-17  5185aeeaa824a5b9957cf69b30dc0e5e
+
+    04283-0001-Questionnaire.pdf        -       -         -       2017-07-17  85d2fb84124c8b1cabb7a1003d6b9791
+
+    04283-0001-Setup.dct                -       -         -       2017-07-17  77b8aed6a5eee90227b2b6c6bfe3ba1b
+
+    04283-0001-Setup.do                 -       -         -       2017-07-17  ee8f0a97a9dbb176eeea77bd9c40afc4
+
+    04283-0001-Setup.sas                -       -         -       2017-07-17  49c8b692b3905974c9571a899549be21
+
+    04283-0001-Setup.sps                -       -         -       2017-07-17  875da1bce51cd837a9ef8df91cb761fd
+
+    04283-0001-Supplemental_syntax.do   -       -         -       2017-07-17  1a4dce00159ddbe4352fb5ead4a58bdc
+
+    04283-0001-Supplemental_syntax.sas  -       -         -       2017-07-17  c37da28115d9e8685b34acd74b1d4894
+
+
+DS0002 Kindergarten Classroom Level Public-Use Version
+
+    Filename                            Record  Record    Var.    Date        MD5
+                                        Length  Count     Count   Updated     Checksum
+
+    04283-0002-Codebook.pdf             -       -         -       2017-07-17  f122b68c60cae74642668f77ca3ee4aa
+
+    04283-0002-Data.dta                 -       794       169     2017-07-17  8753860fdd04a7d3a9d6a5f0b16b4ef8
+
+    04283-0002-Data.rda                 -       794       169     2017-07-17  546f05d7d8322f41fea12cc0c76fe5d1
+
+    04283-0002-Data.sav                 -       794       169     2017-07-17  60d2b99d802358173d8518487b0f762f
+
+    04283-0002-Data.stc                 -       794       169     2017-07-17  8beecf50fad8eaec565153ddf08d026a
+
+    04283-0002-Data.tsv                 -       794       169     2017-07-17  706f6b1e44ef7738c1254005e5a2a472
+
+    04283-0002-Data.txt                 1595    794       169     2017-07-17  53460d17fc24c0376d8823555d7bb273
+
+    04283-0002-Setup.dct                -       -         -       2017-07-17  5701fa1a8669a9aa5ef8366141043e4a
+
+    04283-0002-Setup.do                 -       -         -       2017-07-17  e2c9e578b24fa77187dd4dc6e6d9feaf
+
+    04283-0002-Setup.sas                -       -         -       2017-07-17  2355f00779d09086903633a0dabca9e4
+
+    04283-0002-Setup.sps                -       -         -       2017-07-17  f709378da6fd646f6cbbf8bc2496802b
+
+    04283-0002-Supplemental_syntax.do   -       -         -       2017-07-17  ce83177cf5b02808aabb8a1b5a4452cd
+
+    04283-0002-Supplemental_syntax.sas  -       -         -       2017-07-17  c10ec16fbd9b469d4c11e5054fc0f526
+
+
+DS0003 Pre-K Classroom Level Public-Use Version
+
+    Filename                            Record  Record    Var.    Date        MD5
+                                        Length  Count     Count   Updated     Checksum
+
+    04283-0003-Codebook.pdf             -       -         -       2017-07-17  8642af18f644461e318922525e73df2d
+
+    04283-0003-Data.dta                 -       245       261     2017-07-17  e0abe4ce13fc6f9982898d282c8fef21
+
+    04283-0003-Data.rda                 -       245       261     2017-07-17  1fe478110c64e38a6ff14f4bef43bb7b
+
+    04283-0003-Data.sav                 -       245       261     2017-07-17  33a2247f9ef7bfb150a69a57217161eb
+
+    04283-0003-Data.stc                 -       245       261     2017-07-17  733a1926b033f42875c9a0e75e4f6925
+
+    04283-0003-Data.tsv                 -       245       261     2017-07-17  1ac299ec12fcb1971d0fa97ba487ef32
+
+    04283-0003-Data.txt                 1975    245       261     2017-07-17  3617f175573b2a32f9ff0015b275a230
+
+    04283-0003-Setup.dct                -       -         -       2017-07-17  4f5291e2ac96ccd4efd95e78031e48f3
+
+    04283-0003-Setup.do                 -       -         -       2017-07-17  06b291f99b1ea97bfbfc5b5a9c58b814
+
+    04283-0003-Setup.sas                -       -         -       2017-07-17  90ec0952a9ed205b4cea63faf6092f32
+
+    04283-0003-Setup.sps                -       -         -       2017-07-17  f7280fe8e8add41b3f2d6023adbf607d
+
+    04283-0003-Supplemental_syntax.do   -       -         -       2017-07-17  e212d06c4175a4bc6905170e44c1eb8b
+
+    04283-0003-Supplemental_syntax.sas  -       -         -       2017-07-17  641d999ea22c278fdb0d72bf78ebc4b7
+
+
+Version History
+
+2017-07-17 Codebooks for Main Child Level Public-Use file, the Kindergarten
+Classroom Level Public-Use file, and the Pre-K Classroom Level Public-Use
+file have been updated to include the actual text of survey questions for
+each variable. In addition, online analysis (SDA) has been updated for the
+Main Child Level Public-Use file and has been added for the Kindergarten
+Classroom Level Public-Use file and the Pre-K Classroom Level Public-Use
+file.  2013-06-21 The Kindergarten Classroom Level Public-Use file, the
+Pre-K Classroom Level Public-Use file, the Main Child Level Restricted-Use
+file, the Kindergarten Classroom Level Restricted-Use file, and the Pre-K
+Classroom Level Restricted-Use file have been updated: character variables
+were recoded to numeric and missings were designated.  2013-02-20 The Main
+Child Level Public-Use file has been updated: 116 character variables were
+recoded to numeric and missings were designated for use in SDA.  2010-12-16
+The Restricted Data Use Agreement has been updated.  2009-07-27 The
+Restricted Data Use Agreement has been modified.  2009-06-17 The Restricted
+Data Use Agreement has been added.  2009-06-08 Main Child Level Public-Use
+Version differs from the previous version of the main dataset due to  the
+addition of the following variables: T_BAP, T_BAK, T_BAE, SITE_TRPS,
+SITE_TRKF, SITE_TRKS, SITE_ECK. The Main Child Level Public-Use Version
+differs from the Main Child Level Restricted-Use Version in that SITE and
+SPSU have been dropped from the public-use version. A few labels were
+corrected: SITE_PF  were corrected so that subjects with no fall pre-k data
+do not have a value in this variable. STATE was dropped in favor of SPSU.
+Nonrestricted  and restricted versions of the classroom-level datasets were
+created for Kindergarten and Pre-Kindergarten: Kindergarten Classroom Level
+Public-Use Version differs from Kindergarten Classroom Level Restricted-Use
+Version and Pre-K Classroom Level Public-Use Version differs from Pre-K
+Classroom Level Restricted-Use Version in that SITE and SPSU have been
+dropped.  2006-03-28 A restricted-use version of the data file has been
+added to this collection.

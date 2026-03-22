@@ -1,0 +1,10 @@
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+*.Rproj
+**/*_cache/
+**/*.utf8.md
+**/*.knit.md
+.quarto/
+data/temp/

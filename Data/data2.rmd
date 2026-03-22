@@ -1,0 +1,179 @@
+Error Message whenever running any model other than Pooled OLS
+Error in plm.fit(data, model = models[1L], effect = effect) : empty model
+Use Lm 
+Control for period
+DiD with student as a factor 
+lm( score ~ factor(STUDY_ID) + Term)
+
+https://asjadnaqvi.github.io/DiD/docs/code_r/07-twfe_r/
+
+
+
+```{r message=FALSE, warning=FALSE} 
+library(tidyverse)
+library(gapminder)
+library(dplyr)
+library(MASS)
+library(readxl)
+library(haven)
+library(tinytex)
+library(car)
+library(wooldridge)
+library(stargazer)
+library(plm)
+setwd("C:/Users/mvbas/OneDrive/Desktop/Econometrics/Project/ICPSR_04283/Data")
+```
+
+
+```{r}
+
+load(file="04283-0001-Data.rda")
+load(file="04283-0002-Data.rda")
+load(file="04283-0003-Data.rda")
+
+data1 <- da04283.0001
+data2 <- da04283.0002
+data3 <- da04283.0003
+
+```
+
+
+
+Make Variables: 
+```{r}
+
+
+filtered_data2 <- data1 %>%
+  dplyr::select(
+    STUDY_ID, T_IDEAP, T_IDEAK, 
+    CLS_SIZEPF, CLS_SIZEPS, CLS_SIZEKF, CLS_SIZEKS,
+    CHGENP, CHRACE_AAP, CHRACE_ASP, CHRACE_LTP, CHRACE_NAP, 
+    CHINCOMCP, CHMATEDCP, CHRACE_WHP,
+    PPVTEPF, PPVTEPS, PPVTEKF, PPVTEKS,
+    CCNES1AK, CCNES1BK, CCNES1CK, CCNES1DK, CCNES1EK, CCNES1FK,
+    CCNES2AK, CCNES2BK, CCNES2CK, CCNES2DK, CCNES2EK, CCNES2FK,
+    CCNES3AK, CCNES3BK, CCNES3CK, CCNES3DK, CCNES3EK, CCNES3FK,
+    CCNES4AK, CCNES4BK, CCNES4CK, CCNES4DK, CCNES4EK, CCNES4FK,
+    CCNES5AK, CCNES5BK, CCNES5CK, CCNES5DK, CCNES5EK, CCNES5FK
+  )
+
+cleaned_data2 <- filtered_data2 %>%
+  filter(across(c(T_IDEAP, T_IDEAK, CLS_SIZEPF,CLS_SIZEPS,CLS_SIZEKF,CLS_SIZEKS,PPVTEPF,PPVTEPS,PPVTEKF,PPVTEKS, CCNES1AK, CCNES1BK, CCNES1CK, CCNES1DK, CCNES1EK, CCNES1FK,
+    CCNES2AK, CCNES2BK, CCNES2CK, CCNES2DK, CCNES2EK, CCNES2FK,
+    CCNES3AK, CCNES3BK, CCNES3CK, CCNES3DK, CCNES3EK, CCNES3FK,
+    CCNES4AK, CCNES4BK, CCNES4CK, CCNES4DK, CCNES4EK, CCNES4FK,
+    CCNES5AK, CCNES5BK, CCNES5CK, CCNES5DK, CCNES5EK, CCNES5FK), ~!is.na(.)))
+
+```
+
+
+Change from Wide to Long Format:
+```{r}
+
+long_data_K <- cleaned_data2 %>%
+  pivot_longer(
+    cols = c(
+      CLS_SIZEPF, CLS_SIZEPS, CLS_SIZEKF, CLS_SIZEKS,
+      PPVTEPF, PPVTEPS, PPVTEKF, PPVTEKS
+    ),
+    names_to = c(".value", "time_period"),
+    names_pattern = "(CLS_SIZE|PPVTE)(PF|PS|KF|KS)"
+  ) %>%
+  mutate(
+    T_IDEA = case_when(
+      time_period %in% c("PF", "PS") ~ T_IDEAP,
+      time_period %in% c("KF", "KS") ~ T_IDEAK
+    ),
+    time = case_when(
+      time_period == "PF" ~ 1,
+      time_period == "PS" ~ 2,
+      time_period == "KF" ~ 3,
+      time_period == "KS" ~ 4
+    ),
+    period_label = case_when(
+      time_period == "PF" ~ "Fall Pre-K",
+      time_period == "PS" ~ "Spring Pre-K",
+      time_period == "KF" ~ "Fall Kindergarten",
+      time_period == "KS" ~ "Spring Kindergarten"
+    )
+  ) %>%
+  mutate(
+    across(c(CCNES1AK, CCNES1BK, CCNES1DK,
+             CCNES2AK, CCNES2BK,
+             CCNES3BK, CCNES3CK, CCNES3EK,
+             CCNES4AK, CCNES4BK,
+             CCNES5AK, CCNES5BK, CCNES5CK),
+           ~ 8 - ., .names = "rev_{.col}"),
+    
+    modernity_score = rowMeans(across(
+      c(
+        CCNES1CK, CCNES1EK, CCNES1FK,
+        CCNES2CK, CCNES2DK, CCNES2EK, CCNES2FK,
+        CCNES3AK, CCNES3DK, CCNES3FK,
+        CCNES4CK, CCNES4DK, CCNES4EK, CCNES4FK,
+        CCNES5DK, CCNES5EK, CCNES5FK,
+        rev_CCNES1AK, rev_CCNES1BK, rev_CCNES1DK,
+        rev_CCNES2AK, rev_CCNES2BK,
+        rev_CCNES3BK, rev_CCNES3CK, rev_CCNES3EK,
+        rev_CCNES4AK, rev_CCNES4BK,
+        rev_CCNES5AK, rev_CCNES5BK, rev_CCNES5CK
+      )
+    ), na.rm = TRUE)
+  ) %>%
+  rename(MOD_SCORE = modernity_score)
+
+
+```
+
+
+Standardize Scores:
+```{r} 
+# Create standardized z-scores
+long_data_K <- long_data_K %>%
+  group_by(time_period) %>%
+  mutate(
+    # Standardize within each period
+    T_IDEA_std = case_when(
+      time_period %in% c("KF", "KS") ~ (T_IDEA - mean(T_IDEA, na.rm = TRUE)) / sd(T_IDEA, na.rm = TRUE)
+    )
+  ) %>%
+  ungroup()
+
+  
+```
+
+
+Panel Data Set up:
+```{r}
+
+long_data_K <- long_data_K %>%
+  filter(time_period %in% c("KF", "KS")) %>%
+  dplyr::select(-T_IDEAP)
+
+
+panel_data_K <- pdata.frame(long_data_K, index = c("STUDY_ID", "time"))
+
+
+```
+
+
+```{r clean_data_2}
+panel_data_clean_K <- panel_data_K %>%
+  filter(!is.na(PPVTE), !is.na(CLS_SIZE), !is.na(T_IDEA))
+```
+
+
+Pooled OLS Regression: 
+```{r}
+
+
+re_model_2 <- plm(PPVTE ~ CLS_SIZE + T_IDEA_std + MOD_SCORE +  CHGENP + CHRACE_AAP + CHRACE_ASP + CHRACE_LTP + CHRACE_NAP + CHINCOMCP + CHMATEDCP, 
+                data = panel_data_clean_K,
+                model = "pooling")
+
+stargazer(re_model_2, type = 'text')
+
+```
+
+
+

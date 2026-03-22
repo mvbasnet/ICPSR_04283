@@ -1,0 +1,434 @@
+
+---
+title: "Data"
+author: "Maanav Basnet"
+date: "04-04-2025"
+output: pdf_document
+---
+
+```{r message=FALSE, warning=FALSE} 
+library(tidyverse)
+library(gapminder)
+library(dplyr)
+library(MASS)
+library(readxl)
+library(haven)
+library(tinytex)
+library(car)
+library(stargazer)
+library(plm)
+library(lmtest)
+library(pastecs)
+library(psych)
+setwd("C:/Users/mvbas/OneDrive/Desktop/Econometrics/Project/ICPSR_04283/Data")
+```
+
+
+```{r}
+
+load(file="04283-0001-Data.rda")
+load(file="04283-0002-Data.rda")
+load(file="04283-0003-Data.rda")
+
+data1 <- da04283.0001
+data2 <- da04283.0002
+data3 <- da04283.0003
+
+```
+
+
+Filter Dataset: 
+```{r}
+filtered_data1 <- data1 %>% 
+  dplyr::select(STUDY_ID, T_IDEAP, T_IDEAK, CLS_SIZEPF, CLS_SIZEPS, CLS_SIZEKF, CLS_SIZEKS, CHGENP,CHRACE_AAP,CHRACE_ASP,CHRACE_LTP, CHRACE_NAP, CHINCOMCP, CHMATEDCP,CHRACE_WHP, PPVTEPF, PPVTEPS, PPVTEKF, PPVTEKS)
+
+cleaned_data1 <- filtered_data1 %>%
+  filter(across(c(T_IDEAP, T_IDEAK, CLS_SIZEPF,CLS_SIZEPS,CLS_SIZEKF,CLS_SIZEKS,PPVTEPF,PPVTEPS,PPVTEKF,PPVTEKS), ~!is.na(.)))
+```
+
+Standardize Scores:
+```{r}
+cleaned_data1 <- cleaned_data1 %>% 
+    mutate(T_IDEAP = T_IDEAP/16)
+
+```
+
+
+
+Convert to Long:
+```{r}
+
+# Alternative approach for handling teacher attitudes
+long_data <- cleaned_data1 %>%
+  # First handle variables with 4 time points
+  pivot_longer(
+    cols = c(
+      # Class size variables
+      CLS_SIZEPF, CLS_SIZEPS, CLS_SIZEKF, CLS_SIZEKS,
+      # PPVT test score variables  
+      PPVTEPF, PPVTEPS, PPVTEKF, PPVTEKS
+    ),
+    names_to = c(".value", "time_period"),
+    names_pattern = "(CLS_SIZE|PPVTE)(PF|PS|KF|KS)"
+  ) %>%
+  # Then add teacher attitude based on the time period
+  mutate(
+    T_IDEA = case_when(
+      time_period %in% c("PF", "PS") ~ T_IDEAP,
+      time_period %in% c("KF", "KS") ~ T_IDEAK
+    ),
+    time = case_when(
+      time_period == "PF" ~ 1,
+      time_period == "PS" ~ 2,
+      time_period == "KF" ~ 3,
+      time_period == "KS" ~ 4
+    ),
+    period_label = case_when(
+      time_period == "PF" ~ "Fall Pre-K",
+      time_period == "PS" ~ "Spring Pre-K",
+      time_period == "KF" ~ "Fall Kindergarten",
+      time_period == "KS" ~ "Spring Kindergarten"
+    )
+  )
+
+```
+
+
+
+
+Variable Search: 
+```{r}
+
+grep("NCEDL", names(data3), value = TRUE)
+
+grep("letterspf", names(data1), value = TRUE)
+
+# Assume child_dataset and teacher_dataset are your two datasets
+common_vars <- intersect(names(data1), names(data2))
+common_vars2 <- intersect(names(data2), names(data3))
+common_vars3 <- intersect(names(data1), names(data3))
+
+# Print the common variables
+print(common_vars)
+print(common_vars2)
+print(common_vars3)
+
+
+# Find the column index using match
+column_index_P <- match("T_IDEAP", names(data3))
+column_index2_K <- match("T_IDEAK", names(data2))
+
+column_index <- match("RACE", names(data1))
+print(column_index)
+
+# Print the column index
+print(column_index_P)
+print(column_index2_K)
+print(column_index)
+
+
+
+
+# Assume your dataset is called 'child_dataset'
+column_length <- length(data2$CASEID)
+
+# Print the length of the column
+print(column_length)
+
+
+```
+
+
+
+
+Panel Data Set up:
+```{r}
+panel_data <- pdata.frame(long_data, index = c("STUDY_ID", "time"))
+
+summary(panel_data$PPVTE)
+summary(panel_data$CLS_SIZE)
+summary(panel_data$T_IDEA)
+
+sum(complete.cases(panel_data[, c("PPVTE", "CLS_SIZE", "T_IDEA")]))
+```
+
+
+Clean Panel Data: 
+```{r}
+panel_data_clean <- panel_data %>%
+  filter(!is.na(PPVTE), !is.na(CLS_SIZE), !is.na(T_IDEA))
+```
+
+Pooled OLS: 
+```{r}
+pooled_model <- plm(PPVTE ~ CLS_SIZE + T_IDEA +  CHGENP + CHRACE_AAP + CHRACE_ASP + CHRACE_LTP + CHRACE_NAP + CHINCOMCP + CHMATEDCP, 
+                data = panel_data_clean,
+                model = "pooling")
+
+
+
+
+stargazer(pooled_model, type = 'text')
+```
+
+
+
+Fixed Effects: 
+```{r}
+#Fixed Effects
+fe_model <- plm(PPVTE ~ CLS_SIZE + T_IDEA  +  CHGENP + CHRACE_AAP + CHRACE_ASP + CHRACE_LTP + CHRACE_NAP + CHINCOMCP + CHMATEDCP, 
+                data = panel_data_clean, 
+                model = "within")
+
+#Individual Effects
+fe_model_2 <- plm(PPVTE ~ CLS_SIZE + T_IDEA +  CHGENP + CHRACE_AAP + CHRACE_ASP + CHRACE_LTP + CHRACE_NAP + CHINCOMCP + CHMATEDCP, 
+                data = panel_data_clean,
+                model = "within",
+                effect = "individual")
+
+#Time Effects
+fe_model_3 <- plm(PPVTE ~ CLS_SIZE + T_IDEA +  CHGENP + CHRACE_AAP + CHRACE_ASP + CHRACE_LTP + CHRACE_NAP + CHINCOMCP + CHMATEDCP, 
+                data = panel_data_clean,
+                model = "within",
+                effect = "time")
+
+stargazer(fe_model, type = 'text') #Fixed Effects
+stargazer(fe_model_2, type = 'text') #Individual Effects
+stargazer(fe_model_3, type = 'text') #Time Effects
+
+
+
+bp_test <- bptest(fe_model)
+print(bp_test)
+
+
+model_robust <- coeftest(fe_model, vcov = vcovHC(fe_model, type = "HC0", sandwich = T))
+
+print(model_robust)
+
+stargazer(model_robust, type = 'text')
+
+
+```
+
+
+
+
+Two-Way Fixed Effects: 
+
+```{r}
+twoway_fe_model <- plm(PPVTE ~ CLS_SIZE + T_IDEA,
+                        data = panel_data_clean,
+                        model = "within",
+                        effect = "twoways")
+
+twoway_fe_model2 <- plm(PPVTE ~ CLS_SIZE + T_IDEA + factor(time),
+                        data = panel_data_clean,
+                        model = "within",
+                        effect = "twoways")
+
+stargazer(twoway_fe_model, type = 'text')
+stargazer(twoway_fe_model2, type = 'text')
+
+coeftest(twoway_fe_model, vcov = vcovHC(twoway_fe_model, type = "HC1"))
+
+
+```
+
+
+
+
+Random Effects: 
+```{r}
+re_model <- plm(PPVTE ~ CLS_SIZE + T_IDEA +  CHGENP + CHRACE_AAP + CHRACE_ASP + CHRACE_LTP + CHRACE_NAP + CHINCOMCP + CHMATEDCP, 
+                data = panel_data_clean,
+                model = "random")
+
+
+
+
+stargazer(re_model, type = 'text')
+```
+
+
+Hausman Test: 
+```{r}
+hausman_test <- phtest(re_model, fe_model)
+print(hausman_test)
+
+```
+
+Checking Individual R Squared:
+```{r}
+modelcheck <- lm(PPVTE ~ T_IDEA + factor(time) + factor(STUDY_ID), data = long_data)
+
+stargazer(modelcheck, type = 'text')
+```
+
+
+DiD:
+```{r}
+did_data <- long_data %>%
+  mutate(
+    # Create period indicator (0 = Pre-K, 1 = Kindergarten)
+    period = ifelse(time_period %in% c("KF", "KS"), 1, 0),
+    
+    # You'll need a treatment indicator - this depends on your specific question
+    # For example, if you're looking at progressive vs traditional teaching styles:
+    treatment = ifelse(T_IDEA > median(T_IDEA, na.rm = TRUE), 1, 0)
+  )
+
+# Run the DiD model
+did_model <- plm(PPVTE ~ treatment + period + treatment:period, 
+                data = pdata.frame(did_data, index = c("STUDY_ID", "time")),
+                model = "pooling")  # Use pooling for standard DiD
+
+
+did_model_2 <- plm(PPVTE ~ treatment + period + treatment:period, 
+                data = pdata.frame(did_data, index = c("STUDY_ID", "time")),
+                model = "within")  #  Two-way fixed effects DiD model
+
+# View results
+summary(did_model)
+
+stargazer(did_model, type = 'text')
+
+stargazer(did_model_2, type = "text")
+
+
+median_test_score <- median(long_data$PPVTE, na.rm = TRUE)
+
+print(median_test_score)
+
+```
+
+
+
+Another DiD:
+```{r}
+# Better approach would be:
+did_data_2 <- long_data %>%
+  mutate(
+    # Treatment should be time-invariant (1 if ever treated)
+    treated = ifelse(T_IDEA > median(T_IDEA, na.rm = TRUE), 1, 0),
+    
+    # Post period indicator
+    post = ifelse(time_period %in% c("KF", "KS"), 1, 0)
+  )
+
+# DiD model with fixed effects
+did_model3 <- plm(PPVTE ~ treated * post, 
+                data = pdata.frame(did_data_2, index = c("STUDY_ID", "time_period")),
+                model = "within")
+
+
+
+# Or using lm with clustered SEs:
+did_model <- lm(PPVTE ~ treated * post, data = did_data)
+# Use coeftest with clustered standard errors
+```
+
+
+Parallel Trends: 
+```{r}
+# Create average outcome by time period and treatment group
+trends_data <- did_data %>%
+  # Assuming you've already defined your treatment variable
+  group_by(time_period, treatment) %>%
+  summarize(mean_PPVTE = mean(PPVTE, na.rm = TRUE)) %>%
+  ungroup()
+
+# Convert time_period to an ordered factor
+trends_data <- trends_data %>%
+  mutate(time_period = factor(time_period, levels = c("PF", "PS", "KF", "KS")))
+
+# Plot pre-treatment and post-treatment periods
+ggplot(trends_data, aes(x = time_period, y = mean_PPVTE, group = treatment, color = factor(treatment))) +
+  geom_line(size = 1) +
+  geom_point(size = 3) +
+  geom_vline(xintercept = 2.5, linetype = "dashed") +  # Mark treatment timing between PS and KF
+  labs(title = "Test Score Trends by Treatment Group",
+       subtitle = "Vertical line indicates transition to treatment",
+       x = "Time Period", 
+       y = "Average PPVTE Score",
+       color = "Treatment Group") +
+  theme_minimal()
+
+
+```
+
+
+
+
+
+Checking R-Squared: 
+```{r}
+model <- lm( PPVTE ~ T_IDEA + factor(time) + factor(STUDY_ID), data = long_data)
+
+stargazer(model, type = 'text')
+
+```
+
+
+
+```{r}
+panel_resid <- data.frame(
+  fitted = fitted(fe_model),
+  residuals = residuals(fe_model)
+)
+
+# Create residual plot
+ggplot(panel_resid, aes(x = fitted, y = residuals)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_smooth(se = FALSE, method = "loess", color = "blue") +
+  labs(title = "Residuals vs Fitted Values for Panel Model",
+       x = "Fitted Values",
+       y = "Residuals")
+
+
+
+p1 <- ggplot(plot_data, aes(x = CLS_SIZE, y = residuals)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "loess", se = FALSE, color = "red") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(title = "Class Size vs Residuals",
+       x = "Class Size", 
+       y = "Residuals")
+
+# 2. Teacher attitude vs residuals
+p2 <- ggplot(plot_data, aes(x = T_IDEA, y = residuals)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "loess", se = FALSE, color = "red") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(title = "Teacher Attitude vs Residuals",
+       x = "Teacher Attitude Score", 
+       y = "Residuals")
+
+# 3. Time period vs residuals
+p3 <- ggplot(plot_data, aes(x = factor(time_period), y = residuals)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(title = "Time Period vs Residuals",
+       x = "Time Period", 
+       y = "Residuals")
+
+# 4. For categorical variables (if any)
+# Example for a categorical variable like student race
+if("CHRACE_WHP" %in% colnames(plot_data)) {
+  p4 <- ggplot(plot_data, aes(x = factor(CHRACE_WHP), y = residuals)) +
+    geom_boxplot() +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(title = "Student Race (White) vs Residuals",
+         x = "White (1=Yes, 0=No)", 
+         y = "Residuals")
+}
+
+# Display plots
+grid.arrange(p1, p2, p3, ncol = 2)
+# Add p4 and other plots as needed
+```
+
+
+
+
