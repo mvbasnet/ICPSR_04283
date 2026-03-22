@@ -10,16 +10,21 @@ library(car)
 library(wooldridge)
 library(stargazer)
 library(plm)
-setwd("C:/Users/mvbas/OneDrive/Desktop/Econometrics/Project/ICPSR_04283/Data")
+library(here)
+
+knitr::opts_knit$set(root.dir = here())
+
+raw_dir <- here("data", "raw", "icpsr_04283")
+reports_dir <- here("output", "reports")
 ```
 
 
 
 ```{r}
 
-load(file="04283-0001-Data.rda")
-load(file="04283-0002-Data.rda")
-load(file="04283-0003-Data.rda")
+load(file.path(raw_dir, "04283-0001-Data.rda"))
+load(file.path(raw_dir, "04283-0002-Data.rda"))
+load(file.path(raw_dir, "04283-0003-Data.rda"))
 
 data1 <- da04283.0001
 data2 <- da04283.0002

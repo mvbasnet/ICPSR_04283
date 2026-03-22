@@ -20,15 +20,27 @@ library(plm)
 library(lmtest)
 library(pastecs)
 library(psych)
-setwd("C:/Users/mvbas/OneDrive/Desktop/Econometrics/Project/ICPSR_04283/Data")
+library(here)
+
+knitr::opts_knit$set(root.dir = here())
+
+raw_dir <- here("data", "raw", "icpsr_04283")
+processed_dir <- here("data", "processed")
+temp_dir <- here("data", "temp")
+reports_dir <- here("output", "reports")
+tables_dir <- here("output", "tables")
+figures_dir <- here("output", "figures")
+verification_dir <- here("output", "verification")
+helpers_dir <- here("code", "helpers")
+docs_dir <- here("docs", "icpsr")
 ```
 
 
 ```{r}
 
-load(file="04283-0001-Data.rda")
-load(file="04283-0002-Data.rda")
-load(file="04283-0003-Data.rda")
+load(file.path(raw_dir, "04283-0001-Data.rda"))
+load(file.path(raw_dir, "04283-0002-Data.rda"))
+load(file.path(raw_dir, "04283-0003-Data.rda"))
 
 data1 <- da04283.0001
 data2 <- da04283.0002
