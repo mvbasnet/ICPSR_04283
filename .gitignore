@@ -1,10 +1,143 @@
+# ==========================================
+# Operating System Files
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ==========================================
+# R / RStudio
+# ==========================================
 .Rhistory
 .RData
+.Rapp.history
 .Ruserdata
 .Rproj.user/
+.httr-oauth
+.Renviron
+
+# renv
+renv/library/
+renv/staging/
+
+# ==========================================
+# Python
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# ==========================================
+# Stata
+# ==========================================
+*.smcl
+*.log
+*.stpr
+*.stsem
+*.tmp
+
+# Large / restricted Stata datasets
+# Do not version Stata datasets
+*.dta
+
+# Exceptions for tiny public/example data, if needed
+!data/example/*.dta
+!data/small_public/*.dta
+
+# ==========================================
+# Environment Variables / Secrets
+# ==========================================
+.env
+.env.local
+*.key
+*.pem
+
+# ==========================================
+# Logs / Temp Files
+# ==========================================
+*.log
+*.tmp
+*.temp
+*~
+
+# ==========================================
+# Data folders
+# ==========================================
+raw_data/
+clean_data/
+derived_data/
+data/raw/
+data/processed/
+
+# ==========================================
+# Generated outputs
+# ==========================================
+output/
+rendered/
+generated_figures/
+cache/
+*_cache/
+*_files/
+
+# ==========================================
+# LaTeX / knitr / Quarto auxiliary files
+# ==========================================
+*.aux
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex*
+*.nav
+*.snm
+*.bbl
+*.blg
+*.bcf
+*.run.xml
 *.Rproj
 **/*_cache/
 **/*.utf8.md
 **/*.knit.md
 .quarto/
+
+# ==========================================
+# AI / Editor state
+# ==========================================
+.cursor/
+.codex/
+.claude/
+.vscode/
+.idea/
+
+
+# ==========================================
+# ICPSR_04283 project-specific rules
+# ==========================================
+
+# Research data
+Data/raw/
+Data/processed/
+Data/temp/
+data/raw/
+data/processed/
 data/temp/
+
+# Raw R-format research data
+*.rda
+
+# Generated legacy analysis render
+code/analysis/*.pdf
