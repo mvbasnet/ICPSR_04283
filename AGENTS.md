@@ -52,6 +52,48 @@
 - Build the revised analysis in new modular files.
 - Preserve the ability to inspect the old analysis for comparison.
 
+## Documentation consultation and unresolved questions
+
+- Treat the ICPSR codebooks, questionnaires, setup files, supplemental
+  syntax, manifest, and study documentation as the authoritative sources
+  for variable definitions and data construction.
+
+- Do not infer undocumented transformations, missing-value rules,
+  variable directions, scale harmonizations, identifiers, or dataset
+  linkages from names or empirical patterns alone.
+
+- When a substantive ambiguity could plausibly be resolved from the
+  documentation, first search the documentation available in the
+  repository.
+
+- If the documentation currently available does not resolve the issue,
+  pause only the affected transformation or decision and ask the user a
+  concise, targeted question. State:
+  - the variable(s) or issue involved;
+  - the exact question requiring resolution;
+  - what documentation has already been checked;
+  - any conflicting evidence;
+  - why the answer matters;
+  - the alternative implementation choices implied by the possible answers.
+
+- The user may consult NotebookLM or other document-search tools and
+  return relevant passages or citations. Treat such summaries as
+  navigation aids and verify the conclusion against the underlying
+  project documentation whenever possible.
+
+- When older general documentation conflicts with documentation or
+  setup/derivation syntax for the released dataset being analyzed,
+  prefer the release-specific evidence for interpreting that released
+  data, but document the discrepancy rather than silently resolving it.
+  If release-specific sources themselves conflict, ask the user before
+  implementing the affected transformation.
+
+- Do not block unrelated documentation-independent work while awaiting
+  clarification.
+
+- Maintain an explicit record of unresolved documentation issues rather
+  than silently resolving them by assumption.
+
 ## Econometric and Research Rules
 
 - Do not choose, remove, or prefer specifications based on statistical significance.
@@ -59,7 +101,9 @@
 - Do not use causal language unless the research design explicitly supports causal identification.
 - Do not infer variable definitions from variable names alone.
 - Verify substantive variable definitions against the supplied dataset documentation/codebooks.
-- If documentation is ambiguous, stop and report the ambiguity rather than guessing.
+- If documentation is ambiguous, stop the affected transformation or
+  decision and report the ambiguity rather than guessing. Continue
+  unrelated documentation-independent work where safe.
 - Record observation counts after important filters and sample restrictions.
 - Do not silently drop observations.
 - Within each outcome, nested specifications must use the same estimation sample unless explicitly instructed otherwise.
@@ -86,11 +130,17 @@ Important diagnostics include:
 - within-child variation in teacher attitude between Pre-K and Kindergarten;
 - number of unique children, teachers, classrooms, schools/sites, and states where identifiable;
 - children per teacher/classroom;
-- teacher changes across grades;
+- teacher and classroom changes both across grades and within grade/wave
+  intervals where identifiable;
 - missingness by variable and wave;
 - balanced versus unbalanced panel counts;
 - sample attrition under alternative restrictions;
 - availability and validity of teacher/classroom/site identifiers.
+
+During the initial reconstruction/diagnostic phase, do not run the
+revised paper's substantive regressions, choose a preferred
+specification, finalize an estimation sample, or choose the final
+clustering/inference procedure unless explicitly instructed.
 
 Do not implement the old median-split Difference-in-Differences exercise as part of the revised core analysis.
 
