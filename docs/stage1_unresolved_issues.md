@@ -4,12 +4,14 @@ This record accompanies `docs/stage1_variable_crosswalk.csv`. It separates docum
 
 ## Q01 - Released construction of `T_IDEAP` and `T_IDEAK`
 
+- **Human-review status:** Reviewed. The documentary scale conflict is confirmed; review does not authorize a transformation.
 - **Exact question:** How were the two released Modernity variables scored, and is dividing `T_IDEAP` by 16 the formally correct way to place it on the same scale as `T_IDEAK`?
-- **Sources checked:** DS0001 codebook pp. 538 and 788; DS0001 Stata dictionary and setup file; DS0001 questionnaire p. 22 (Fall Pre-K item 31) and p. 33 (Fall Kindergarten item 40); study user guide pp. 23, 26, and 40; manifest.
+- **Sources checked:** DS0001 codebook pp. 538 and 788; DS0002 codebook p. 57; DS0001 Stata dictionary and setup file; DS0001 questionnaire p. 22 (Fall Pre-K item 31) and p. 33 (Fall Kindergarten item 40); study user guide pp. 23, 26, and 40; manifest.
 - **Established documentation:** Both questionnaires contain the same 16 Likert items. The user guide says scores are means, non-traditional beliefs are reverse-scored, and higher values indicate more progressive beliefs. `T_IDEAP` is from the Fall Pre-K teacher questionnaire and `T_IDEAK` is from the Fall Kindergarten teacher questionnaire.
+- **Released-dataset location:** `T_IDEAK` occurs in both DS0001 and DS0002. The DS0001 copy is the relevant child-level variable for this reconstruction.
 - **Conflict:** The released child file stores `T_IDEAP` on a sum-like scale but `T_IDEAK` on a mean-like scale. The older guide's Kindergarten summary is also sum-like, despite the released Kindergarten variable being mean-like. No available release-specific source explicitly authorizes `T_IDEAP / 16`.
 - **Why it matters:** An undocumented rescaling would determine the magnitude and interpretation of the teacher-belief measure and its change across grades.
-- **Blocked later step:** Harmonization, construction of any generic teacher-belief column, and the Fall Pre-K-to-Fall Kindergarten variation audit.
+- **Blocked later step:** `T_IDEAP / 16`, harmonization, construction of any generic teacher-belief column, spring carry-forward or grade assignment, and the Fall Pre-K-to-Fall Kindergarten variation audit.
 - **Alternatives after resolution:** (a) apply an explicitly documented release transformation; (b) retain the two released scales separately; or (c) omit cross-grade change analyses if comparability cannot be established.
 - **Evidence that could resolve it:** The manifest-listed DS0001 supplemental derivation syntax or another release-specific source that explicitly states the released scoring transformation.
 
@@ -61,7 +63,7 @@ If harmonization is approved later, the panel design must keep distinct fields f
 
 - **Exact question:** Does `LEAD_1` identify unique teachers, and over what population or period is it unique?
 - **Sources checked:** DS0003 codebook p. 159, Stata dictionary line 122, Stata setup, questionnaire, and user guide.
-- **Conflicting or incomplete evidence:** The documentary label is only `Teacher ID`; no uniqueness or scope statement was found. Its empirical distribution is reported only in the generated validation output and cannot substitute for missing documentation.
+- **Conflicting or incomplete evidence:** The documentary label is only `Teacher ID`; no uniqueness or scope statement was found. The released DS0003 file has 245 rows, 244 nonmissing `LEAD_1` observations, and three distinct nonmissing values (50, 52, and 58). The earlier claim of only three nonmissing values was incorrect. These empirical facts cannot substitute for missing documentation.
 - **Why it matters:** Treating it as a unique teacher key could seriously misstate teacher counts and nesting.
 - **Blocked later step:** Unique-teacher counts, children-per-teacher calculations, or clustering based on `LEAD_1`.
 - **Alternatives after resolution:** Use it only if scope and uniqueness are documented, or report that a usable teacher identifier is unavailable.
@@ -79,24 +81,28 @@ If harmonization is approved later, the panel design must keep distinct fields f
 
 ## Q08 - Relationship between `T_CHNGCP` and `T_CHNG`
 
+- **Human-review status:** Reviewed. The indicators are related but distinct; exact derivation and reconciliation remain unresolved.
 - **Exact question:** How does the child-level `T_CHNGCP` construction differ from the teacher-questionnaire `T_CHNG`, including their treatment of classroom changes and missing reports?
-- **Sources checked:** DS0001 codebook pp. 313 and 580, Stata dictionary, Stata setup, questionnaire, and user guide.
+- **Sources checked:** DS0001 codebook pp. 313 and 580; DS0003 codebook; DS0001 and DS0003 Stata dictionaries and setup files; questionnaire; and user guide.
+- **Released-dataset location:** `T_CHNG` occurs in both DS0001 and DS0003. The DS0001 copy is directly relevant to comparison with child-level `T_CHNGCP`.
 - **Conflicting or incomplete evidence:** Both use categories for no change, teacher change, and classroom change, but one is explicitly based on child-level data and the other comes from the teacher questionnaire. No available derivation explains discrepancies.
 - **Why it matters:** Selecting one without understanding construction could misclassify exposure to a different teacher.
-- **Blocked later step:** A preferred Pre-K change flag or reconciliation rule.
+- **Blocked later step:** A preferred or reconciled Pre-K change flag. Code `2 = classroom change` must not be treated as proof of teacher change without separate documentation.
 - **Alternatives after resolution:** Report both separately, prioritize an explicitly documented derivation, or construct a reconciled flag only if authorized.
 - **Evidence that could resolve it:** DS0001 supplemental derivation syntax or another release-specific construction note.
 
 ## Q09 - English/Spanish assessment mapping and comparability
 
+- **Human-review status:** Reviewed. The conservative implementation rule is confirmed; the Kindergarten Spanish-battery English-PPVT mapping remains unresolved.
 - **Exact question:** Which released field implements the guide's statement that Kindergarten Spanish-battery children received a separate English PPVT, and are any English and Spanish scores intended to be combined?
 - **Sources checked:** DS0001 codebook and setup entries for PPVT, TVIP, and Woodcock-Muñoz fields; user guide pp. 25, 27, 48, 54, and 56; assessment-status variables.
-- **Conflicting or incomplete evidence:** The guide distinguishes English and Spanish batteries and notes a separate English PPVT in Kindergarten. It does not identify a cross-language harmonization rule or establish equivalence between PPVT and TVIP or between WJ-III and Woodcock-Muñoz scores.
+- **Conflicting or incomplete evidence:** The guide distinguishes English and Spanish batteries and notes a separate English PPVT in Kindergarten. It does not identify a cross-language conversion, equating, harmonization, or imputation rule. The exact public-release field for the separately described Kindergarten English PPVT among Spanish-battery children has not been identified, so ordinary `PPVTEKF` and `PPVTEKS` must not be assumed to contain those scores.
+- **Assessment-status correction:** `ASMSTATPF` code `4 = Non-English, Spanish-Speaking Child Failed Pre-LAS` has 6 observations. Code 4 was zero only in the later waves checked, not in every wave.
 - **Why it matters:** Combining batteries without a documented rule would change outcome definitions and could conflate distinct instruments and score metrics.
-- **Blocked later step:** Any cross-language combined outcome or imputation from a Spanish counterpart.
+- **Blocked later step:** Any cross-language pooling, equating, conversion, combined outcome, or imputation from another battery.
 - **Alternatives after resolution:** Keep batteries separate, or apply only an explicitly documented release harmonization.
 - **Evidence that could resolve it:** Release-specific scoring or variable-mapping documentation.
 
 ## Review boundary
 
-Pending user review, all transformations marked `blocked` or `proposed_not_approved` remain unauthorized. This tranche does not recode special values, harmonize teacher beliefs, carry values into spring periods, build a cleaned wide file or long panel, link datasets, define an estimation sample, run Stage 2 diagnostics, or estimate regressions.
+Human review is recorded for Q01, Q08, and Q09, but all transformations marked `blocked` or `proposed_not_approved` remain unauthorized. Review confirms conservative implementation restrictions; it does not approve a transformation. This tranche does not recode special values, harmonize teacher beliefs, carry values into spring periods, build a cleaned wide file or long panel, link datasets, define an estimation sample, run Stage 2 diagnostics, or estimate regressions.

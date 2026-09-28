@@ -58,7 +58,7 @@ if (anyDuplicated(crosswalk[c("dataset_id", "raw_variable")])) {
 
 allowed_documentation <- c("verified", "partial", "conflict", "unresolved")
 allowed_transformation <- c("none", "proposed_not_approved", "approved", "blocked")
-allowed_review <- c("pending", "approved", "rejected", "not_applicable")
+allowed_review <- c("pending", "reviewed", "approved", "rejected", "not_applicable")
 if (any(!crosswalk$documentation_status %in% allowed_documentation)) stop("Invalid documentation_status value.")
 if (any(!crosswalk$transformation_status %in% allowed_transformation)) stop("Invalid transformation_status value.")
 if (any(!crosswalk$review_status %in% allowed_review)) stop("Invalid review_status value.")
@@ -217,6 +217,68 @@ write.csv(
   fileEncoding = "UTF-8"
 )
 
+identifier_specs <- data.frame(
+  dataset_id = c("DS0001", "DS0002", "DS0003", "DS0003"),
+  variable = c("STUDY_ID", "CASEID", "CASEID", "LEAD_1"),
+  stringsAsFactors = FALSE
+)
+
+identifier_rows <- lapply(seq_len(nrow(identifier_specs)), function(i) {
+  dataset_id <- identifier_specs$dataset_id[[i]]
+  variable <- identifier_specs$variable[[i]]
+  dataset <- raw_data[[dataset_id]]
+  if (!variable %in% names(dataset)) stop(dataset_id, " is missing identifier variable ", variable, ".")
+
+  value <- dataset[[variable]]
+  nonmissing <- !is.na(value)
+  nonmissing_value <- value[nonmissing]
+  numeric_value <- if (is.numeric(nonmissing_value) && !is.factor(nonmissing_value)) nonmissing_value else numeric()
+  distinct_nonmissing <- length(unique(nonmissing_value))
+
+  data.frame(
+    dataset = dataset_id,
+    variable = variable,
+    n_rows = nrow(dataset),
+    n_nonmissing = sum(nonmissing),
+    n_distinct_nonmissing = distinct_nonmissing,
+    duplicate_count = sum(nonmissing) - distinct_nonmissing,
+    duplicate_count_definition = "Nonmissing observations beyond the first occurrence of each distinct value.",
+    min = if (length(numeric_value) > 0L) format_number(min(numeric_value)) else NA_character_,
+    max = if (length(numeric_value) > 0L) format_number(max(numeric_value)) else NA_character_,
+    stringsAsFactors = FALSE
+  )
+})
+identifier_audit <- do.call(rbind, identifier_rows)
+if (nrow(identifier_audit) != 4L) stop("Identifier audit must contain exactly four rows.")
+
+write.csv(
+  identifier_audit,
+  file.path(table_dir, "identifier_audit.csv"),
+  row.names = FALSE,
+  na = "",
+  fileEncoding = "UTF-8"
+)
+
+lead_1 <- raw_data$DS0003$LEAD_1
+lead_1_text <- as.character(lead_1)
+lead_1_frequency <- as.data.frame(
+  table(value = lead_1_text, useNA = "always"),
+  stringsAsFactors = FALSE,
+  responseName = "frequency"
+)
+lead_1_frequency$value <- ifelse(is.na(lead_1_frequency$value), "<missing>", lead_1_frequency$value)
+lead_1_frequency$dataset <- "DS0003"
+lead_1_frequency$variable <- "LEAD_1"
+lead_1_frequency <- lead_1_frequency[c("dataset", "variable", "value", "frequency")]
+
+write.csv(
+  lead_1_frequency,
+  file.path(table_dir, "lead_1_frequency.csv"),
+  row.names = FALSE,
+  na = "",
+  fileEncoding = "UTF-8"
+)
+
 if (any(!validation$variable_exists)) {
   stop("Crosswalk validation failed because one or more variables are absent from the stated dataset.")
 }
@@ -230,3 +292,4 @@ message(
   sum(validation$validation_status == "pass"), " pass; ",
   sum(validation$validation_status == "review_needed"), " review_needed."
 )
+message("Identifier audit completed for four dataset-variable pairs; wrote LEAD_1 frequency table.")
